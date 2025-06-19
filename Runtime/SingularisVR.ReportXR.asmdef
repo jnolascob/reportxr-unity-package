@@ -1,0 +1,15 @@
+{
+  "name": "SingularisVR.ReportXR",
+  "rootNamespace": "SingularisVR.ReportXR",
+  "references": [],
+  "includePlatforms": [
+    "Android",
+    "Editor",
+    "WindowsStandalone32",
+    "WindowsStandalone64"
+  ],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "overrideReferences": false,
+  "noEngineReferences": false
+}
