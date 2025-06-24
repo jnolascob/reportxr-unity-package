@@ -1,19 +1,56 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 
 
 namespace SingularisVR.ReportXR
 {
+
+
+
+
+
+    [System.Serializable]
+    public class MoodleUser
+    {
+        public string sitename;
+        public string username;
+        public string firstname;
+        public string lastname;
+        public string fullname;
+        public string lang;
+        public int userid;
+        public string userpictureurl;
+        public string release;
+        public string version;
+        public string userprivateaccesskey;
+    }
+
+    [System.Serializable]
+    public class MoodleResponse
+    {
+        public string token;
+        public MoodleUser user;
+    }
+
+
+
+
+
+
     public class ReportXR 
     {
         private static bool isInitialized = false;
         private static AndroidJavaClass unityClass;
         private static AndroidJavaObject unityActivity;
         private static AndroidJavaObject rXRLib;
-        
+        public const string userName = "user_vr";
+        public const string password = "Az12345678-";
+
 
         /// <summary>
-        /// Inicializa el SDK de informXR, envolviendo la inicializaci�n en tu propio SDK.
+        /// Inicializa el SDK de informXR, envolviendo la inicialización en tu propio SDK.
         /// </summary>
         public static void Initialize(string appId, string orgId, string authSecret)
         {
@@ -23,7 +60,7 @@ namespace SingularisVR.ReportXR
                 return;
             }
 
-            // Aqu� usas las llamadas reales al SDK base de informXR
+            // Aquí usas las llamadas reales al SDK base de informXR
 
 
             isInitialized = true;
@@ -44,7 +81,7 @@ namespace SingularisVR.ReportXR
         {
             //EnsureInitialized();
 
-            //InformXRManager.TrackEvent(name, meta); // Llama al m�todo real del SDK base
+            //InformXRManager.TrackEvent(name, meta); // Llama al método real del SDK base
             Debug.Log($"Evento enviado: {name}");
         }
 
@@ -90,10 +127,14 @@ namespace SingularisVR.ReportXR
             //var meta = ParseMetaString(metaString);
             //EventLevelComplete(levelName, score, meta);
         }
+       
+
 
 
         public static void CallAddEvent()
         {
+
+           
 
             unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
             unityActivity = unityClass.GetStatic<AndroidJavaObject>("currentActivity");
@@ -122,7 +163,74 @@ namespace SingularisVR.ReportXR
 
 
         }
+
+
+        public static void TestLogin()
+        {
+            CallLogin(userName, password);
+        }
+
+
+
+
+        public static void CallLogin(string username, string password)
+        {
+
+          AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+          AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+         AndroidJavaClass pluginClass = new AndroidJavaClass("com.singularisvr.reportxr.plugin.rXRLib"); // Reemplazá con el nombre real
+
+         UnityCallbackProxy callback = new UnityCallbackProxy(result => {
+         Debug.Log("Login result: " + result);
+
+             
+             CallEvent(result);
+
+         });
+        
+
+
+         pluginClass.CallStatic("login", currentActivity, username, password, callback);
+        }
+
+        private static void CallEvent(string result)
+        {
+
+            MoodleResponse response = JsonUtility.FromJson<MoodleResponse>(result);
+            Debug.Log("Token: " + response.token);
+            Debug.Log("Usuario: " + response.user.username);
+            Debug.Log("UserId" + response.user.userid);
+
+
+            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+            AndroidJavaClass pluginClass = new AndroidJavaClass("com.singularisvr.reportxr.plugin.rXRLib"); // Reemplazá con el nombre real
+
+            UnityCallbackProxy callback = new UnityCallbackProxy(result => {
+
+                Debug.Log("Succes Sending Event" + result);
+
+            });
+
+
+
+            pluginClass.CallStatic("sendEvent", currentActivity, 12, response.user.userid, 2, "test", "test2", callback);
+
+
+
+
+
+
+
+
+
+        }
+
     }
+
+ 
 
 
 }
