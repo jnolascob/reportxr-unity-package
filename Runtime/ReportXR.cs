@@ -47,6 +47,7 @@ namespace SingularisVR.ReportXR
         private static AndroidJavaObject rXRLib;
         public const string userName = "user_vr";
         public const string password = "Az12345678-";
+		public const string scormName = "Abra 2004";
 
 
         /// <summary>
@@ -167,13 +168,13 @@ namespace SingularisVR.ReportXR
 
         public static void TestLogin()
         {
-            CallLogin(userName, password);
+            CallLogin(userName, password, scormName);
         }
 
 
 
 
-        public static void CallLogin(string username, string password)
+        public static void CallLogin(string username, string password, string scormName)
         {
 
           AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
@@ -191,7 +192,7 @@ namespace SingularisVR.ReportXR
         
 
 
-         pluginClass.CallStatic("login", currentActivity, username, password, callback);
+         pluginClass.CallStatic("login", currentActivity, username, password, scormName, callback);
         }
 
         private static void CallEvent(string result)
