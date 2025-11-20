@@ -186,6 +186,21 @@ namespace SingularisVR.ReportXR {
             pluginClass.CallStatic("sendEvent", currentActivity, token, scoId, attempt, eventName, eventValue, callback);
         }
 
+        public static void CallEvent(int userId, int attempt, string eventName, string eventValue) {
+
+            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+            AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+
+            AndroidJavaClass pluginClass = new AndroidJavaClass("com.singularisvr.reportxr.plugin.rXRLib");
+
+            UnityCallbackProxy callback = new UnityCallbackProxy(result => {
+                Debug.Log($"[ReportXR] Event result: {result}");
+                OnEventSent?.Invoke(result);
+            });
+
+            pluginClass.CallStatic("sendSingularisEvent", currentActivity, userId, attempt, eventName, eventValue, callback);
+        }
+
     }
 
 
